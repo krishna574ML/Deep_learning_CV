@@ -227,3 +227,51 @@ Once you have completed the setup and installation steps:
 
 **Expected Output:**
 The script will train the Perceptron on the AND gate dataset. You will see output similar to the following (the exact epoch of convergence and final weights/bias may vary slightly due to random initialization):
+
+## Code Explanation
+
+The `perceptron.py` script defines a `Perceptron` class with the following key methods:
+
+-   **`__init__(self, learning_rate=0.01, n_epochs=100)`**:
+    The constructor for the Perceptron class.
+    -   `learning_rate`: A float that determines the step size for adjusting weights and bias during training. A smaller value means smaller adjustments.
+    -   `n_epochs`: An integer representing the number of times the training algorithm will iterate over the entire training dataset.
+    -   `self.weights`: Initialized to `None`. They will be set in the `fit` method to a NumPy array with a size equal to the number of input features.
+    -   `self.bias`: Initialized to `None`. It will be set as a scalar value in the `fit` method.
+    -   `self.activation_fn`: Assigned to the `_step_function` method.
+
+-   **`_step_function(self, x)`**:
+    This is the activation function. It implements a simple binary step.
+    -   If the input `x` (which is the net input to the neuron) is greater than or equal to 0, it returns `1`.
+    -   Otherwise, it returns `0`.
+    This function determines the final output (prediction) of the Perceptron.
+
+-   **`_weighted_sum(self, X_instance)`**:
+    Calculates the net input (also known as the linear combination or activation score) for a single input instance `X_instance`.
+    -   This is computed as the dot product of the `X_instance` (input features) and the Perceptron's `self.weights`, with the `self.bias` added to the result.
+    -   Formula: $NetInput = \sum_{i} (weights_i \cdot input\_feature_i) + bias$ (or $X \cdot W + b$)
+
+-   **`predict(self, X_instance)`**:
+    Makes a prediction for a single input instance `X_instance`.
+    1.  It first calculates the `linear_output` (net input) by calling `self._weighted_sum(X_instance)`.
+    2.  Then, it passes this `linear_output` through the `self.activation_fn` (which is `_step_function`) to get the final class label (0 or 1).
+
+-   **`fit(self, X_train, y_train)`**:
+    This method trains the Perceptron model using the provided training data (`X_train`, `y_train`).
+    1.  **Initialization**: It determines the number of input features from `X_train.shape`. It then initializes `self.weights` as a NumPy array of small random numbers (one weight per feature) and `self.bias` as a small random scalar (or zero).
+    2.  **Training Loop**: It iterates for `self.n_epochs` times:
+        a.  **Sample Iteration**: Within each epoch, it iterates through each training sample (`x_i`, `y_true`) in `X_train` and `y_train`.
+        b.  **Prediction**: For each sample `x_i`, it makes a `prediction` using the current `self.weights` and `self.bias`.
+        c.  **Error Calculation**: It calculates the `error` as the difference between the true label `y_true` and the `prediction`.
+        d.  **Weight and Bias Update**: If the `error` is not zero (meaning the prediction was incorrect), it updates `self.weights` and `self.bias` based on the Perceptron learning rule:
+            -   $update = learning\_rate \cdot error$
+            -   $weights_{new} = weights_{old} + update \cdot x_i$
+            -   $bias_{new} = bias_{old} + update$
+        e.  **Convergence Check (Optional)**: If no errors are made during an entire epoch, it means the Perceptron has converged on the training data, and the training process can stop early.
+
+## Example: AND Gate
+The script includes an example that demonstrates how to use the `Perceptron` class. It trains the Perceptron to learn the AND logical gate:
+-   **Input Features (`X_and`)**: `[[0,0], [0,1], [1,0], [1,1]]`
+-   **Target Labels (`y_and`)**: `[0, 0, 0, 1]`
+
+After training, the script prints the Perceptron's prediction for each input combination of the AND gate, as well as the final learned weights and bias. This allows you to verify that the Perceptron has successfully learned the linearly separable AND function.
